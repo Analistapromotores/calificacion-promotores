@@ -126,8 +126,6 @@
   .btn-submit:hover:not(:disabled) { background: var(--gold-deep); color: #fff; }
   .btn-submit:active:not(:disabled) { transform: scale(0.98); }
   .btn-submit:disabled { opacity: 0.45; cursor: not-allowed; }
-
-  /* Enviando spinner */
   .btn-submit.sending { background: var(--gold-deep); color: #fff; }
 
   .blocked-card { display: none; text-align: center; padding: 0.5rem 0; }
@@ -161,7 +159,6 @@
   }
   .uid-box strong { display: block; font-size: 0.67rem; text-transform: uppercase; letter-spacing: 0.05em; color: #3B1F8C; margin-bottom: 2px; }
 
-  /* Error de envío */
   .send-error {
     background: var(--red-soft); border: 1px solid rgba(192,57,43,0.2);
     border-radius: 10px; padding: 0.75rem 1rem; margin-top: 0.75rem;
@@ -202,7 +199,6 @@
   <!-- FORMULARIO -->
   <div id="form-section">
 
-    <!-- Promotor cargado del QR -->
     <div id="promotor-ok" class="promotor-card" style="display:none">
       <div class="promotor-avatar" id="promotor-avatar">?</div>
       <div class="promotor-info">
@@ -213,7 +209,6 @@
       <span class="lock-icon">🔒</span>
     </div>
 
-    <!-- Sin promotor -->
     <div id="promotor-missing" class="no-promotor" style="display:none">
       <h3>⚠️ Acceso incorrecto</h3>
       <p>Este formulario solo funciona escaneando el código QR del promotor. Por favor pídele al promotor que te muestre su QR.</p>
@@ -221,12 +216,14 @@
 
     <!-- Teléfono -->
     <div class="field-group" id="phone-group" style="display:none">
-      <label class="field-label" for="telefono">Tu teléfono <span class="required-dot">* obligatorio</span></label>
+      <label class="field-label" for="telefono">
+        Tu teléfono <span style="color:var(--gold-deep);font-size:0.75rem">(obligatorio solo si dejas comentario)</span>
+      </label>
       <div class="phone-row">
         <input type="tel" id="telefono" placeholder="+57 300 000 0000" oninput="onPhoneInput()">
         <button class="btn-call" id="btn-call-inline" disabled onclick="llamar()">📞 Llamar</button>
       </div>
-      <div class="field-error" id="phone-error">El teléfono es obligatorio para continuar</div>
+      <div class="field-error" id="phone-error">Ingresa tu teléfono para poder enviar el comentario</div>
     </div>
 
     <!-- Badges -->
@@ -257,7 +254,7 @@
     <!-- Comentario -->
     <div class="field-group" id="comment-group" style="display:none">
       <label class="field-label" for="comentario">Comentario <span style="color:var(--gold-deep)">(opcional)</span></label>
-      <textarea id="comentario" rows="2" placeholder="¿Qué podemos mejorar?"></textarea>
+      <textarea id="comentario" rows="2" placeholder="¿Qué podemos mejorar?" oninput="tryEnableSubmit()"></textarea>
     </div>
 
     <button class="btn-submit" id="btn-enviar" disabled onclick="enviar()" style="display:none">Selecciona una calificación</button>
@@ -278,12 +275,10 @@
 
 <script>
   // ═══════════════════════════════════════════════════
-  // ⚙️  CONFIGURACIÓN — SOLO EDITA ESTA SECCIÓN
+  // ⚙️  CONFIGURACIÓN
   // ═══════════════════════════════════════════════════
   const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxQWMBw34VJYjpdgU2JDxXQDARv4xyiLTMkAhBzKKPNQoD3R8E8Yxu2jv-P-MXBC9RF/exec';
-  // ↑ Reemplaza con tu URL de Google Apps Script (ver instrucciones abajo)
-
-  const BLOCK_HOURS = 24;  // Horas antes de permitir otra calificación del mismo dispositivo
+  const BLOCK_HOURS = 24;
   // ═══════════════════════════════════════════════════
 
   const LABELS = ['','Malo','Regular','Bueno','Sobresaliente','Excelente'];
@@ -296,15 +291,13 @@
   const formOpenTime = Date.now();
 
   /* ── 1. Leer parámetros de URL ── */
-  // BUG CORREGIDO: el generador usa "nombre" y "cargo", no "name"
   function readURLParams() {
     const params = new URLSearchParams(window.location.search);
-    promotorId    = params.get('id')     || null;
-    // Acepta tanto "nombre" (generado por el generador-qr) como "name" (legacy)
+    promotorId    = params.get('id') || null;
     promotorName  = params.get('nombre') ? decodeURIComponent(params.get('nombre'))
                   : params.get('name')   ? decodeURIComponent(params.get('name'))
                   : null;
-    promotorCargo = params.get('cargo')  ? decodeURIComponent(params.get('cargo')) : null;
+    promotorCargo = params.get('cargo') ? decodeURIComponent(params.get('cargo')) : null;
   }
 
   /* ── 2. Fingerprint ── */
@@ -319,10 +312,7 @@
     document.getElementById('fp-text').textContent = 'ID: ' + deviceFingerprint.substring(0,6) + '…' + deviceFingerprint.slice(-4);
   }
 
-  /* ── 3. Anti-duplicado — localStorage + cookie como doble capa ── */
-  // MEJORA: Google Sites bloquea localStorage en algunos contextos de iframe.
-  // Usamos cookie como fallback para que el bloqueo anti-spam siempre funcione.
-
+  /* ── 3. Anti-duplicado ── */
   function getBlockKey() { return 'rated_' + promotorId + '_' + (deviceFingerprint || 'anon'); }
 
   function setCookie(name, value, hours) {
@@ -338,13 +328,11 @@
     try {
       let ts = null;
       try { ts = localStorage.getItem(getBlockKey()); } catch(e) {}
-      if (!ts) ts = getCookie(getBlockKey()); // fallback cookie
-
+      if (!ts) ts = getCookie(getBlockKey());
       if (!ts) return false;
       const diff  = Date.now() - parseInt(ts);
       const limit = BLOCK_HOURS * 3600000;
       if (diff < limit) { showBlocked(limit - diff); return true; }
-      // Expiró — limpiar
       try { localStorage.removeItem(getBlockKey()); } catch(e) {}
       setCookie(getBlockKey(), '', -1);
     } catch(e) {}
@@ -354,13 +342,12 @@
   function markRated() {
     const now = Date.now().toString();
     try { localStorage.setItem(getBlockKey(), now); } catch(e) {}
-    setCookie(getBlockKey(), now, BLOCK_HOURS + 1); // +1 hora de margen
+    setCookie(getBlockKey(), now, BLOCK_HOURS + 1);
   }
 
   function showBlocked(msLeft) {
     document.getElementById('form-section').style.display = 'none';
-    const bs = document.getElementById('blocked-section');
-    bs.classList.add('show');
+    document.getElementById('blocked-section').classList.add('show');
     document.getElementById('blocked-name').textContent = promotorName || promotorId;
     tick(msLeft);
     const iv = setInterval(() => {
@@ -382,16 +369,11 @@
       document.getElementById('promotor-missing').style.display = 'block';
       return;
     }
-
-    const card = document.getElementById('promotor-ok');
-    card.style.display = 'flex';
+    document.getElementById('promotor-ok').style.display = 'flex';
     document.getElementById('promotor-name-display').textContent = promotorName;
-    if (promotorCargo) {
-      document.getElementById('promotor-cargo-display').textContent = promotorCargo;
-    }
+    if (promotorCargo) document.getElementById('promotor-cargo-display').textContent = promotorCargo;
     const initials = promotorName.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
     document.getElementById('promotor-avatar').textContent = initials;
-
     ['phone-group','badges-row','stars-section','comment-group','btn-enviar'].forEach(id => {
       document.getElementById(id).style.display = id === 'badges-row' ? 'flex' : 'block';
     });
@@ -451,26 +433,40 @@
     document.getElementById('phone-error').classList.remove('show');
     tryEnableSubmit();
   }
+
+  /* ── CORRECCIÓN PRINCIPAL: teléfono solo obligatorio si hay comentario ── */
   function tryEnableSubmit() {
-    const phone = document.getElementById('telefono').value.trim();
-    const btn   = document.getElementById('btn-enviar');
-    const ok    = selectedRating > 0 && phone.length >= 7;
-    btn.disabled    = !ok;
-    btn.textContent = selectedRating === 0 ? 'Selecciona una calificación' : !ok ? 'Ingresa tu teléfono' : 'Enviar calificación ✓';
+    const phone   = document.getElementById('telefono').value.trim();
+    const comment = document.getElementById('comentario').value.trim();
+    const btn     = document.getElementById('btn-enviar');
+    const needsPhone = comment.length > 0;
+    const ok = selectedRating > 0 && (!needsPhone || phone.length >= 7);
+    btn.disabled = !ok;
+    if (selectedRating === 0) {
+      btn.textContent = 'Selecciona una calificación';
+    } else if (needsPhone && phone.length < 7) {
+      btn.textContent = 'Ingresa tu teléfono para enviar el comentario';
+    } else {
+      btn.textContent = 'Enviar calificación ✓';
+    }
   }
+
   function llamar() {
     const t = document.getElementById('telefono').value.trim().replace(/\s/g,'');
     if (t) window.location.href = 'tel:'+t;
   }
 
-  /* ── 8. Submit → Google Sheets via Apps Script ── */
+  /* ── 8. Submit ── */
   function getNow() {
     return new Date().toLocaleString('es-CO',{weekday:'long',year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit',timeZoneName:'short'});
   }
 
   async function enviar() {
-    const phone = document.getElementById('telefono').value.trim();
-    if (!phone || phone.length < 7) {
+    const phone   = document.getElementById('telefono').value.trim();
+    const comment = document.getElementById('comentario').value.trim();
+
+    // Teléfono solo obligatorio si hay comentario
+    if (comment.length > 0 && phone.length < 7) {
       document.getElementById('telefono').classList.add('error-field');
       document.getElementById('phone-error').classList.add('show');
       return;
@@ -487,30 +483,26 @@
     const ts      = Date.now();
 
     const data = {
-      promotor_id:             promotorId,
-      promotor_nombre:         promotorName,
-      promotor_cargo:          promotorCargo || 'Promotor',
-      telefono:                phone,
-      calificacion:            selectedRating,
-      etiqueta:                LABELS[selectedRating],
-      comentario:              document.getElementById('comentario').value.trim() || '(sin comentario)',
-      hora:                    getNow(),
-      timestamp:               ts,
-      lat:                     geoData.lat  || 'No disponible',
-      lon:                     geoData.lon  || 'No disponible',
-      precision_gps:           geoData.accuracy ? geoData.accuracy+'m' : 'No disponible',
-      direccion:               geoData.address || 'No disponible',
-      device_id:               deviceFingerprint,
-      segundos_en_formulario:  elapsed,
-      sospechoso:              elapsed < 4 ? 'SI - respuesta muy rápida' : 'No',
-      user_agent:              navigator.userAgent.substring(0,150)
+      promotor_id:            promotorId,
+      promotor_nombre:        promotorName,
+      promotor_cargo:         promotorCargo || 'Promotor',
+      telefono:               phone || 'No proporcionado',
+      calificacion:           selectedRating,
+      etiqueta:               LABELS[selectedRating],
+      comentario:             comment || '(sin comentario)',
+      hora:                   getNow(),
+      timestamp:              ts,
+      lat:                    geoData.lat      || 'No disponible',
+      lon:                    geoData.lon      || 'No disponible',
+      precision_gps:          geoData.accuracy ? geoData.accuracy+'m' : 'No disponible',
+      direccion:              geoData.address  || 'No disponible',
+      device_id:              deviceFingerprint,
+      segundos_en_formulario: elapsed,
+      sospechoso:             elapsed < 4 ? 'SI - respuesta muy rápida' : 'No',
+      user_agent:             navigator.userAgent.substring(0,150)
     };
 
-    console.log('CALIFICACION:', JSON.stringify(data, null, 2));
-
     try {
-      // Envío a Google Sheets via Apps Script
-      // Usamos no-cors porque Apps Script redirige, pero el dato llega igual
       await fetch(APPS_SCRIPT_URL, {
         method: 'POST',
         mode: 'no-cors',
@@ -518,16 +510,14 @@
         body: JSON.stringify(data)
       });
 
-      // Marcar como calificado (anti-spam)
       markRated();
 
-      // Mostrar resultado
       document.getElementById('form-section').style.display = 'none';
       document.getElementById('result-section').classList.add('show');
 
       document.getElementById('result-data').innerHTML =
         '<strong>Promotor:</strong> '    + escHtml(data.promotor_nombre) + ' · ' + escHtml(data.promotor_cargo) + '<br>' +
-        '<strong>Calificación:</strong> '+ '⭐'.repeat(data.calificacion) + ' ' + data.etiqueta+'<br>' +
+        '<strong>Calificación:</strong> '+ '⭐'.repeat(data.calificacion) + ' ' + data.etiqueta + '<br>' +
         '<strong>Comentario:</strong> '  + escHtml(data.comentario) + '<br>' +
         '<strong>Teléfono:</strong> '    + escHtml(data.telefono) + '<br>' +
         '<strong>Hora:</strong> '        + data.hora + '<br>' +
@@ -542,7 +532,7 @@
 
       document.getElementById('uid-box').innerHTML =
         '<strong>ID único del registro</strong>' +
-        'Promotor: ' + escHtml(data.promotor_id) + ' | Device: '+data.device_id.substring(0,10)+'… | TS: '+ts;
+        'Promotor: ' + escHtml(data.promotor_id) + ' | Device: ' + data.device_id.substring(0,10) + '… | TS: ' + ts;
 
     } catch(e) {
       console.error('Error al enviar:', e);
@@ -553,7 +543,6 @@
     }
   }
 
-  // Escape básico para evitar XSS al insertar datos en innerHTML
   function escHtml(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
   function escAttr(s) { return String(s||'').replace(/"/g,'&quot;'); }
 
@@ -566,45 +555,5 @@
     initGeo();
   });
 </script>
-
-<!--
-════════════════════════════════════════════════════════════
-  INSTRUCCIONES: CONECTAR CON GOOGLE SHEETS
-════════════════════════════════════════════════════════════
-
-PASO 1 — Crear la hoja de cálculo:
-  Crea una Google Sheet con estas columnas en la fila 1 (exactamente así):
-  promotor_id | promotor_nombre | promotor_cargo | telefono | calificacion | etiqueta |
-  comentario | hora | lat | lon | precision_gps | direccion | device_id |
-  segundos_en_formulario | sospechoso | user_agent | timestamp
-
-PASO 2 — Crear el Apps Script:
-  En la Sheet: Extensiones → Apps Script → pega este código:
-
-  function doPost(e) {
-    try {
-      var data = JSON.parse(e.postData.contents);
-      var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-      var headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
-      var row = headers.map(function(h) { return data[h] !== undefined ? data[h] : ''; });
-      sheet.appendRow(row);
-    } catch(err) {}
-    return ContentService.createTextOutput('ok').setMimeType(ContentService.MimeType.TEXT);
-  }
-
-PASO 3 — Publicar el script:
-  Implementar → Nueva implementación → Tipo: Aplicación web
-  Ejecutar como: Yo (tu cuenta)
-  Quién tiene acceso: Cualquier persona
-  → Copiar la URL del deployment → pegarla en APPS_SCRIPT_URL arriba ↑
-
-PASO 4 — Subir calificacion.html a Google Sites:
-  En Sites: Insertar → Insertar código (HTML) → pegar el contenido de este archivo
-  O: aloja el archivo en GitHub Pages / Netlify (gratis) y usa un iFrame en Sites.
-
-  Nota: Google Sites no permite subir HTML directamente como página.
-  La opción más sencilla es GitHub Pages (gratis, en 2 minutos).
-════════════════════════════════════════════════════════════
--->
 </body>
 </html>
