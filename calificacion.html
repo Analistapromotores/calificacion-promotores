@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calificación de Servicio</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@3/dist/fp.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --gold-light: #FFF8E7; --gold-mid: #F4C430; --gold-deep: #C8900A; --gold-dark: #7A5500;
+    --ink: #1A1209; --ink-soft: #5C4A2A; --cream: #FDFAF3; --surface: #FFFEF9;
+    --border: rgba(200,144,10,0.2); --red-soft: #FEF2F2; --red: #C0392B;
+    --green-soft: #F0FDF4; --green: #16A34A; --blue: #1D6FA4; --blue-soft: #EFF6FF;
+  }
+  body {
+    font-family: 'DM Sans', sans-serif; background: var(--cream); min-height: 100vh;
+    display: flex; align-items: center; justify-content: center; padding: 2rem 1rem;
+    background-image: radial-gradient(circle at 20% 20%, rgba(244,196,48,0.08) 0%, transparent 50%),
+                      radial-gradient(circle at 80% 80%, rgba(200,144,10,0.06) 0%, transparent 50%);
+  }
+  .card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 20px;
+    padding: 2.5rem 2rem; width: 100%; max-width: 440px;
+    box-shadow: 0 4px 40px rgba(200,144,10,0.08), 0 1px 4px rgba(0,0,0,0.05);
+  }
+  .logo-wrap { text-align: center; margin-bottom: 1.5rem; }
+  .logo-icon {
+    width: 56px; height: 56px; background: var(--gold-light);
+    border: 1px solid rgba(200,144,10,0.25); border-radius: 16px;
+    display: inline-flex; align-items: center; justify-content: center; margin-bottom: 0.65rem;
+  }
+  h1 { font-family: 'Playfair Display', serif; font-size: 1.45rem; font-weight: 700; color: var(--ink); text-align: center; line-height: 1.25; margin-bottom: 0.3rem; }
+  .subtitle { font-size: 0.86rem; color: var(--ink-soft); text-align: center; }
+  .divider { border: none; border-top: 1px solid var(--border); margin: 1.25rem 0; }
+
+  .promotor-card {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--gold-light); border: 1px solid rgba(200,144,10,0.3);
+    border-radius: 12px; padding: 0.85rem 1rem; margin-bottom: 1.25rem;
+  }
+  .promotor-avatar {
+    width: 42px; height: 42px; border-radius: 50%;
+    background: var(--gold-mid); display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem; font-weight: 700; color: var(--gold-dark); flex-shrink: 0;
+  }
+  .promotor-info { flex: 1; }
+  .promotor-label { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--gold-deep); font-weight: 600; }
+  .promotor-name { font-size: 1rem; font-weight: 500; color: var(--ink); margin-top: 1px; }
+  .promotor-cargo { font-size: 0.78rem; color: var(--ink-soft); }
+  .lock-icon { font-size: 0.85rem; opacity: 0.5; }
+
+  .no-promotor {
+    background: var(--red-soft); border: 1px solid rgba(192,57,43,0.2);
+    border-radius: 12px; padding: 1.25rem; text-align: center; margin-bottom: 1rem;
+  }
+  .no-promotor h3 { color: var(--red); font-size: 1rem; margin-bottom: 0.35rem; }
+  .no-promotor p { font-size: 0.82rem; color: #7f1d1d; line-height: 1.5; }
+
+  .field-label { display: block; font-size: 0.78rem; font-weight: 500; color: var(--ink-soft); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 0.5rem; }
+  .field-group { margin-bottom: 1.1rem; }
+  .required-dot { color: var(--red); }
+  input[type="tel"] {
+    width: 100%; padding: 0.65rem 0.9rem;
+    border: 1px solid var(--border); border-radius: 10px;
+    font-family: 'DM Sans', sans-serif; font-size: 0.95rem;
+    background: var(--cream); color: var(--ink); outline: none; transition: border-color 0.2s;
+  }
+  input:focus { border-color: var(--gold-mid); }
+  input.error-field { border-color: var(--red) !important; }
+  .field-error { font-size: 0.75rem; color: var(--red); margin-top: 4px; display: none; }
+  .field-error.show { display: block; }
+  .phone-row { display: flex; gap: 8px; }
+  .phone-row input { flex: 1; }
+  .btn-call {
+    padding: 0.65rem 0.85rem; background: var(--blue-soft);
+    border: 1px solid rgba(29,111,164,0.25); border-radius: 10px;
+    cursor: pointer; color: var(--blue); font-family: 'DM Sans', sans-serif;
+    font-size: 0.82rem; font-weight: 500; transition: background 0.2s;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .btn-call:hover { background: #DBEAFE; }
+  .btn-call:disabled { opacity: 0.35; cursor: not-allowed; }
+
+  .badge-row { display: flex; gap: 8px; margin-bottom: 1.1rem; flex-wrap: wrap; }
+  .badge {
+    display: flex; align-items: center; gap: 6px; font-size: 0.75rem;
+    padding: 0.38rem 0.65rem; border-radius: 8px; flex: 1; min-width: 140px;
+  }
+  .badge.purple { background: #F8F5FF; border: 1px solid rgba(99,60,180,0.15); color: #5B3FA6; }
+  .badge.geo    { background: var(--gold-light); border: 1px solid rgba(200,144,10,0.15); color: var(--ink-soft); }
+  .badge.geo.ok { background: var(--green-soft); border-color: rgba(22,163,74,0.2); color: #15803d; }
+  .badge.geo.err{ background: var(--red-soft);   border-color: rgba(192,57,43,0.2); color: var(--red); }
+  .bdot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; animation: pulse 1.5s infinite; }
+  .badge.purple .bdot { background: #16A34A; animation: none; }
+  .badge.geo    .bdot { background: var(--gold-mid); }
+  .badge.geo.ok  .bdot { background: var(--green); animation: none; }
+  .badge.geo.err .bdot { background: var(--red);   animation: none; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+  .stars-section { text-align: center; margin: 1.5rem 0 1rem; }
+  .stars-section > p { font-size: 0.86rem; color: var(--ink-soft); margin-bottom: 0.9rem; }
+  .stars { display: flex; justify-content: center; gap: 0.4rem; }
+  .star-btn { background: none; border: none; cursor: pointer; padding: 2px; display: flex; flex-direction: column; align-items: center; gap: 5px; transition: transform 0.15s; }
+  .star-btn:hover { transform: scale(1.12); }
+  .star-svg { width: 42px; height: 42px; }
+  .star-svg path { fill: #E2D9C6; transition: fill 0.2s; }
+  .star-btn.active .star-svg path, .star-btn.hovered .star-svg path { fill: var(--gold-mid); }
+  .star-label { font-size: 0.6rem; color: var(--ink-soft); font-weight: 500; text-transform: uppercase; white-space: nowrap; }
+  .star-btn.active .star-label { color: var(--gold-deep); }
+  .rating-text { margin-top: 0.85rem; font-family: 'Playfair Display', serif; font-size: 1.05rem; font-weight: 700; color: var(--gold-deep); min-height: 1.4rem; }
+
+  textarea {
+    width: 100%; padding: 0.65rem 0.9rem; border: 1px solid var(--border); border-radius: 10px;
+    font-family: 'DM Sans', sans-serif; font-size: 0.92rem; background: var(--cream);
+    color: var(--ink); outline: none; resize: none; transition: border-color 0.2s;
+  }
+  textarea:focus { border-color: var(--gold-mid); }
+
+  .btn-submit {
+    width: 100%; padding: 0.85rem; background: var(--gold-mid); color: var(--gold-dark);
+    border: none; border-radius: 12px; font-family: 'DM Sans', sans-serif;
+    font-size: 1rem; font-weight: 500; cursor: pointer; transition: background 0.2s, transform 0.15s; margin-top: 0.4rem;
+  }
+  .btn-submit:hover:not(:disabled) { background: var(--gold-deep); color: #fff; }
+  .btn-submit:active:not(:disabled) { transform: scale(0.98); }
+  .btn-submit:disabled { opacity: 0.45; cursor: not-allowed; }
+
+  /* Enviando spinner */
+  .btn-submit.sending { background: var(--gold-deep); color: #fff; }
+
+  .blocked-card { display: none; text-align: center; padding: 0.5rem 0; }
+  .blocked-card.show { display: block; }
+  .block-icon { font-size: 2.8rem; margin-bottom: 0.75rem; }
+  .blocked-card h2 { font-family: 'Playfair Display', serif; font-size: 1.25rem; color: var(--ink); margin-bottom: 0.4rem; }
+  .blocked-card p { font-size: 0.86rem; color: var(--ink-soft); line-height: 1.6; }
+  .countdown { font-size: 1.3rem; font-weight: 500; color: var(--red); margin-top: 0.6rem; font-variant-numeric: tabular-nums; }
+
+  .result-card { display: none; text-align: center; padding: 1.25rem 0 0.5rem; }
+  .result-card.show { display: block; }
+  .checkmark { font-size: 2.8rem; margin-bottom: 0.65rem; }
+  .result-card h2 { font-family: 'Playfair Display', serif; font-size: 1.35rem; color: var(--ink); margin-bottom: 0.35rem; }
+  .result-card > p { font-size: 0.86rem; color: var(--ink-soft); line-height: 1.6; }
+  .result-data {
+    margin-top: 1rem; background: var(--gold-light); border: 1px solid var(--border);
+    border-radius: 12px; padding: 0.9rem; text-align: left; font-size: 0.8rem; color: var(--ink-soft); line-height: 2;
+  }
+  .result-data strong { color: var(--ink); }
+  .btn-call-result {
+    display: inline-flex; align-items: center; gap: 8px; margin-top: 0.85rem;
+    padding: 0.6rem 1.3rem; background: var(--green); color: #fff;
+    border: none; border-radius: 10px; cursor: pointer; text-decoration: none;
+    font-family: 'DM Sans', sans-serif; font-size: 0.88rem; font-weight: 500; transition: background 0.2s;
+  }
+  .btn-call-result:hover { background: #15803d; }
+  .uid-box {
+    margin-top: 0.65rem; padding: 0.55rem 0.8rem;
+    background: #F8F5FF; border: 1px solid rgba(99,60,180,0.15);
+    border-radius: 8px; font-size: 0.7rem; color: #5B3FA6; word-break: break-all; line-height: 1.7; text-align: left;
+  }
+  .uid-box strong { display: block; font-size: 0.67rem; text-transform: uppercase; letter-spacing: 0.05em; color: #3B1F8C; margin-bottom: 2px; }
+
+  /* Error de envío */
+  .send-error {
+    background: var(--red-soft); border: 1px solid rgba(192,57,43,0.2);
+    border-radius: 10px; padding: 0.75rem 1rem; margin-top: 0.75rem;
+    font-size: 0.82rem; color: var(--red); display: none;
+  }
+  .send-error.show { display: block; }
+
+  @media(max-width:480px){
+    .card { padding: 1.6rem 1.1rem; border-radius: 16px; }
+    .star-svg { width: 36px; height: 36px; }
+    h1 { font-size: 1.25rem; }
+  }
+</style>
+</head>
+<body>
+<div class="card">
+
+  <div class="logo-wrap">
+    <div class="logo-icon">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" fill="#C8900A"/>
+      </svg>
+    </div>
+    <h1>Califica tu experiencia</h1>
+    <p class="subtitle">Tu opinión nos ayuda a mejorar nuestro servicio</p>
+  </div>
+
+  <hr class="divider">
+
+  <!-- BLOQUEADO -->
+  <div class="blocked-card" id="blocked-section">
+    <div class="block-icon">🔒</div>
+    <h2>Ya calificaste a este promotor</h2>
+    <p>Tu dispositivo ya registró una calificación para <strong id="blocked-name"></strong>.<br>Podrás volver a calificar en:</p>
+    <div class="countdown" id="countdown-text">--:--:--</div>
+  </div>
+
+  <!-- FORMULARIO -->
+  <div id="form-section">
+
+    <!-- Promotor cargado del QR -->
+    <div id="promotor-ok" class="promotor-card" style="display:none">
+      <div class="promotor-avatar" id="promotor-avatar">?</div>
+      <div class="promotor-info">
+        <div class="promotor-label">Estás calificando a</div>
+        <div class="promotor-name" id="promotor-name-display">—</div>
+        <div class="promotor-cargo" id="promotor-cargo-display"></div>
+      </div>
+      <span class="lock-icon">🔒</span>
+    </div>
+
+    <!-- Sin promotor -->
+    <div id="promotor-missing" class="no-promotor" style="display:none">
+      <h3>⚠️ Acceso incorrecto</h3>
+      <p>Este formulario solo funciona escaneando el código QR del promotor. Por favor pídele al promotor que te muestre su QR.</p>
+    </div>
+
+    <!-- Teléfono -->
+    <div class="field-group" id="phone-group" style="display:none">
+      <label class="field-label" for="telefono">Tu teléfono <span class="required-dot">* obligatorio</span></label>
+      <div class="phone-row">
+        <input type="tel" id="telefono" placeholder="+57 300 000 0000" oninput="onPhoneInput()">
+        <button class="btn-call" id="btn-call-inline" disabled onclick="llamar()">📞 Llamar</button>
+      </div>
+      <div class="field-error" id="phone-error">El teléfono es obligatorio para continuar</div>
+    </div>
+
+    <!-- Badges -->
+    <div class="badge-row" id="badges-row" style="display:none">
+      <div class="badge purple" id="fp-badge">
+        <div class="bdot"></div>
+        <span id="fp-text">Generando ID…</span>
+      </div>
+      <div class="badge geo" id="loc-badge">
+        <div class="bdot"></div>
+        <span id="loc-text">Buscando GPS…</span>
+      </div>
+    </div>
+
+    <!-- Estrellas -->
+    <div class="stars-section" id="stars-section" style="display:none">
+      <p>Selecciona tu calificación</p>
+      <div class="stars">
+        <button class="star-btn" data-val="1"><svg class="star-svg" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg><span class="star-label">Malo</span></button>
+        <button class="star-btn" data-val="2"><svg class="star-svg" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg><span class="star-label">Regular</span></button>
+        <button class="star-btn" data-val="3"><svg class="star-svg" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg><span class="star-label">Bueno</span></button>
+        <button class="star-btn" data-val="4"><svg class="star-svg" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg><span class="star-label">Sobre&shy;saliente</span></button>
+        <button class="star-btn" data-val="5"><svg class="star-svg" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg><span class="star-label">Excelente</span></button>
+      </div>
+      <p class="rating-text" id="rating-text"></p>
+    </div>
+
+    <!-- Comentario -->
+    <div class="field-group" id="comment-group" style="display:none">
+      <label class="field-label" for="comentario">Comentario <span style="color:var(--gold-deep)">(opcional)</span></label>
+      <textarea id="comentario" rows="2" placeholder="¿Qué podemos mejorar?"></textarea>
+    </div>
+
+    <button class="btn-submit" id="btn-enviar" disabled onclick="enviar()" style="display:none">Selecciona una calificación</button>
+    <div class="send-error" id="send-error">⚠️ Error al enviar. Verifica tu conexión e intenta de nuevo.</div>
+  </div>
+
+  <!-- RESULTADO -->
+  <div class="result-card" id="result-section">
+    <div class="checkmark">⭐</div>
+    <h2>¡Gracias por tu calificación!</h2>
+    <p>Tu opinión quedó registrada. Si dejaste una sugerencia, podemos contactarte.</p>
+    <div class="result-data" id="result-data"></div>
+    <div id="call-btn-wrap"></div>
+    <div class="uid-box" id="uid-box"></div>
+  </div>
+
+</div>
+
+<script>
+  // ═══════════════════════════════════════════════════
+  // ⚙️  CONFIGURACIÓN — SOLO EDITA ESTA SECCIÓN
+  // ═══════════════════════════════════════════════════
+  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/TU_DEPLOYMENT_ID/exec';
+  // ↑ Reemplaza con tu URL de Google Apps Script (ver instrucciones abajo)
+
+  const BLOCK_HOURS = 24;  // Horas antes de permitir otra calificación del mismo dispositivo
+  // ═══════════════════════════════════════════════════
+
+  const LABELS = ['','Malo','Regular','Bueno','Sobresaliente','Excelente'];
+  let selectedRating = 0;
+  let deviceFingerprint = null;
+  let promotorId   = null;
+  let promotorName = null;
+  let promotorCargo = null;
+  let geoData = { lat: null, lon: null, accuracy: null, address: 'No disponible' };
+  const formOpenTime = Date.now();
+
+  /* ── 1. Leer parámetros de URL ── */
+  // BUG CORREGIDO: el generador usa "nombre" y "cargo", no "name"
+  function readURLParams() {
+    const params = new URLSearchParams(window.location.search);
+    promotorId    = params.get('id')     || null;
+    // Acepta tanto "nombre" (generado por el generador-qr) como "name" (legacy)
+    promotorName  = params.get('nombre') ? decodeURIComponent(params.get('nombre'))
+                  : params.get('name')   ? decodeURIComponent(params.get('name'))
+                  : null;
+    promotorCargo = params.get('cargo')  ? decodeURIComponent(params.get('cargo')) : null;
+  }
+
+  /* ── 2. Fingerprint ── */
+  async function initFingerprint() {
+    try {
+      const fp = await FingerprintJS.load();
+      const r  = await fp.get();
+      deviceFingerprint = r.visitorId;
+    } catch(e) {
+      deviceFingerprint = 'fp-' + navigator.userAgent.length + screen.width + screen.height + new Date().getTimezoneOffset();
+    }
+    document.getElementById('fp-text').textContent = 'ID: ' + deviceFingerprint.substring(0,6) + '…' + deviceFingerprint.slice(-4);
+  }
+
+  /* ── 3. Anti-duplicado — localStorage + cookie como doble capa ── */
+  // MEJORA: Google Sites bloquea localStorage en algunos contextos de iframe.
+  // Usamos cookie como fallback para que el bloqueo anti-spam siempre funcione.
+
+  function getBlockKey() { return 'rated_' + promotorId + '_' + (deviceFingerprint || 'anon'); }
+
+  function setCookie(name, value, hours) {
+    const exp = new Date(Date.now() + hours * 3600000).toUTCString();
+    document.cookie = name + '=' + encodeURIComponent(value) + '; expires=' + exp + '; path=/; SameSite=Lax';
+  }
+  function getCookie(name) {
+    const match = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
+    return match ? decodeURIComponent(match[2]) : null;
+  }
+
+  function checkBlocked() {
+    try {
+      let ts = null;
+      try { ts = localStorage.getItem(getBlockKey()); } catch(e) {}
+      if (!ts) ts = getCookie(getBlockKey()); // fallback cookie
+
+      if (!ts) return false;
+      const diff  = Date.now() - parseInt(ts);
+      const limit = BLOCK_HOURS * 3600000;
+      if (diff < limit) { showBlocked(limit - diff); return true; }
+      // Expiró — limpiar
+      try { localStorage.removeItem(getBlockKey()); } catch(e) {}
+      setCookie(getBlockKey(), '', -1);
+    } catch(e) {}
+    return false;
+  }
+
+  function markRated() {
+    const now = Date.now().toString();
+    try { localStorage.setItem(getBlockKey(), now); } catch(e) {}
+    setCookie(getBlockKey(), now, BLOCK_HOURS + 1); // +1 hora de margen
+  }
+
+  function showBlocked(msLeft) {
+    document.getElementById('form-section').style.display = 'none';
+    const bs = document.getElementById('blocked-section');
+    bs.classList.add('show');
+    document.getElementById('blocked-name').textContent = promotorName || promotorId;
+    tick(msLeft);
+    const iv = setInterval(() => {
+      msLeft -= 1000;
+      if (msLeft <= 0) { clearInterval(iv); location.reload(); }
+      else tick(msLeft);
+    }, 1000);
+  }
+
+  function tick(ms) {
+    const h = Math.floor(ms/3600000), m = Math.floor((ms%3600000)/60000), s = Math.floor((ms%60000)/1000);
+    document.getElementById('countdown-text').textContent = pad(h)+':'+pad(m)+':'+pad(s)+' horas restantes';
+  }
+  function pad(n) { return n.toString().padStart(2,'0'); }
+
+  /* ── 4. Mostrar UI ── */
+  function buildUI() {
+    if (!promotorId || !promotorName) {
+      document.getElementById('promotor-missing').style.display = 'block';
+      return;
+    }
+
+    const card = document.getElementById('promotor-ok');
+    card.style.display = 'flex';
+    document.getElementById('promotor-name-display').textContent = promotorName;
+    if (promotorCargo) {
+      document.getElementById('promotor-cargo-display').textContent = promotorCargo;
+    }
+    const initials = promotorName.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+    document.getElementById('promotor-avatar').textContent = initials;
+
+    ['phone-group','badges-row','stars-section','comment-group','btn-enviar'].forEach(id => {
+      document.getElementById(id).style.display = id === 'badges-row' ? 'flex' : 'block';
+    });
+  }
+
+  /* ── 5. Geo ── */
+  function initGeo() {
+    if (!navigator.geolocation) { setGeo('err','Sin GPS'); return; }
+    navigator.geolocation.getCurrentPosition(
+      pos => {
+        geoData.lat = pos.coords.latitude.toFixed(6);
+        geoData.lon = pos.coords.longitude.toFixed(6);
+        geoData.accuracy = Math.round(pos.coords.accuracy);
+        setGeo('ok','📍 ±'+geoData.accuracy+'m');
+        fetch('https://nominatim.openstreetmap.org/reverse?lat='+geoData.lat+'&lon='+geoData.lon+'&format=json')
+          .then(r=>r.json()).then(d=>{
+            if(d && d.address){
+              geoData.address = d.display_name || '';
+              const a = d.address;
+              setGeo('ok','📍 '+[a.road,a.suburb,a.city||a.town].filter(Boolean).slice(0,2).join(', '));
+            }
+          }).catch(()=>{});
+      },
+      err => {
+        const m = {1:'Sin permiso GPS',2:'GPS no disponible',3:'Tiempo agotado'};
+        setGeo('err', m[err.code]||'Error GPS');
+      },
+      { enableHighAccuracy:true, timeout:12000, maximumAge:0 }
+    );
+  }
+  function setGeo(type, msg) {
+    const el = document.getElementById('loc-badge');
+    el.className = 'badge geo' + (type==='ok'?' ok':type==='err'?' err':'');
+    document.getElementById('loc-text').textContent = msg;
+  }
+
+  /* ── 6. Estrellas ── */
+  const stars = document.querySelectorAll('.star-btn');
+  stars.forEach(btn => {
+    btn.addEventListener('click', () => {
+      selectedRating = parseInt(btn.dataset.val);
+      updateStars(selectedRating);
+      document.getElementById('rating-text').textContent = LABELS[selectedRating];
+      tryEnableSubmit();
+    });
+    btn.addEventListener('mouseenter', () => hoverStars(parseInt(btn.dataset.val)));
+    btn.addEventListener('mouseleave', () => updateStars(selectedRating));
+  });
+  function updateStars(n) { stars.forEach(b => { b.classList.toggle('active', parseInt(b.dataset.val)<=n); b.classList.remove('hovered'); }); }
+  function hoverStars(n)  { stars.forEach(b => { b.classList.remove('active'); b.classList.toggle('hovered', parseInt(b.dataset.val)<=n); }); }
+
+  /* ── 7. Teléfono ── */
+  function onPhoneInput() {
+    const v = document.getElementById('telefono').value.trim();
+    document.getElementById('btn-call-inline').disabled = v.length < 7;
+    document.getElementById('telefono').classList.remove('error-field');
+    document.getElementById('phone-error').classList.remove('show');
+    tryEnableSubmit();
+  }
+  function tryEnableSubmit() {
+    const phone = document.getElementById('telefono').value.trim();
+    const btn   = document.getElementById('btn-enviar');
+    const ok    = selectedRating > 0 && phone.length >= 7;
+    btn.disabled    = !ok;
+    btn.textContent = selectedRating === 0 ? 'Selecciona una calificación' : !ok ? 'Ingresa tu teléfono' : 'Enviar calificación ✓';
+  }
+  function llamar() {
+    const t = document.getElementById('telefono').value.trim().replace(/\s/g,'');
+    if (t) window.location.href = 'tel:'+t;
+  }
+
+  /* ── 8. Submit → Google Sheets via Apps Script ── */
+  function getNow() {
+    return new Date().toLocaleString('es-CO',{weekday:'long',year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit',timeZoneName:'short'});
+  }
+
+  async function enviar() {
+    const phone = document.getElementById('telefono').value.trim();
+    if (!phone || phone.length < 7) {
+      document.getElementById('telefono').classList.add('error-field');
+      document.getElementById('phone-error').classList.add('show');
+      return;
+    }
+    if (!selectedRating) return;
+
+    const btn = document.getElementById('btn-enviar');
+    btn.disabled = true;
+    btn.classList.add('sending');
+    btn.textContent = '⏳ Enviando…';
+    document.getElementById('send-error').classList.remove('show');
+
+    const elapsed = Math.round((Date.now() - formOpenTime) / 1000);
+    const ts      = Date.now();
+
+    const data = {
+      promotor_id:             promotorId,
+      promotor_nombre:         promotorName,
+      promotor_cargo:          promotorCargo || 'Promotor',
+      telefono:                phone,
+      calificacion:            selectedRating,
+      etiqueta:                LABELS[selectedRating],
+      comentario:              document.getElementById('comentario').value.trim() || '(sin comentario)',
+      hora:                    getNow(),
+      timestamp:               ts,
+      lat:                     geoData.lat  || 'No disponible',
+      lon:                     geoData.lon  || 'No disponible',
+      precision_gps:           geoData.accuracy ? geoData.accuracy+'m' : 'No disponible',
+      direccion:               geoData.address || 'No disponible',
+      device_id:               deviceFingerprint,
+      segundos_en_formulario:  elapsed,
+      sospechoso:              elapsed < 4 ? 'SI - respuesta muy rápida' : 'No',
+      user_agent:              navigator.userAgent.substring(0,150)
+    };
+
+    console.log('CALIFICACION:', JSON.stringify(data, null, 2));
+
+    try {
+      // Envío a Google Sheets via Apps Script
+      // Usamos no-cors porque Apps Script redirige, pero el dato llega igual
+      await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify(data)
+      });
+
+      // Marcar como calificado (anti-spam)
+      markRated();
+
+      // Mostrar resultado
+      document.getElementById('form-section').style.display = 'none';
+      document.getElementById('result-section').classList.add('show');
+
+      document.getElementById('result-data').innerHTML =
+        '<strong>Promotor:</strong> '    + escHtml(data.promotor_nombre) + ' · ' + escHtml(data.promotor_cargo) + '<br>' +
+        '<strong>Calificación:</strong> '+ '⭐'.repeat(data.calificacion) + ' ' + data.etiqueta+'<br>' +
+        '<strong>Comentario:</strong> '  + escHtml(data.comentario) + '<br>' +
+        '<strong>Teléfono:</strong> '    + escHtml(data.telefono) + '<br>' +
+        '<strong>Hora:</strong> '        + data.hora + '<br>' +
+        '<strong>Ubicación:</strong> '   + (data.lat !== 'No disponible' ? data.lat+', '+data.lon+' (±'+data.precision_gps+')' : 'No disponible') + '<br>' +
+        '<strong>Dirección:</strong> '   + escHtml(data.direccion).substring(0,100) +
+        (data.sospechoso !== 'No' ? '<br>⚠️ <strong>Respuesta sospechosa:</strong> '+elapsed+' seg.' : '');
+
+      if (phone) {
+        document.getElementById('call-btn-wrap').innerHTML =
+          '<a class="btn-call-result" href="tel:'+escAttr(phone.replace(/\s/g,''))+'">📞 Llamar a '+escHtml(phone)+'</a>';
+      }
+
+      document.getElementById('uid-box').innerHTML =
+        '<strong>ID único del registro</strong>' +
+        'Promotor: ' + escHtml(data.promotor_id) + ' | Device: '+data.device_id.substring(0,10)+'… | TS: '+ts;
+
+    } catch(e) {
+      console.error('Error al enviar:', e);
+      btn.disabled = false;
+      btn.classList.remove('sending');
+      btn.textContent = 'Enviar calificación ✓';
+      document.getElementById('send-error').classList.add('show');
+    }
+  }
+
+  // Escape básico para evitar XSS al insertar datos en innerHTML
+  function escHtml(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function escAttr(s) { return String(s||'').replace(/"/g,'&quot;'); }
+
+  /* ── INIT ── */
+  window.addEventListener('load', async () => {
+    readURLParams();
+    await initFingerprint();
+    const blocked = checkBlocked();
+    if (!blocked) buildUI();
+    initGeo();
+  });
+</script>
+
+<!--
+════════════════════════════════════════════════════════════
+  INSTRUCCIONES: CONECTAR CON GOOGLE SHEETS
+════════════════════════════════════════════════════════════
+
+PASO 1 — Crear la hoja de cálculo:
+  Crea una Google Sheet con estas columnas en la fila 1 (exactamente así):
+  promotor_id | promotor_nombre | promotor_cargo | telefono | calificacion | etiqueta |
+  comentario | hora | lat | lon | precision_gps | direccion | device_id |
+  segundos_en_formulario | sospechoso | user_agent | timestamp
+
+PASO 2 — Crear el Apps Script:
+  En la Sheet: Extensiones → Apps Script → pega este código:
+
+  function doPost(e) {
+    try {
+      var data = JSON.parse(e.postData.contents);
+      var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+      var headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+      var row = headers.map(function(h) { return data[h] !== undefined ? data[h] : ''; });
+      sheet.appendRow(row);
+    } catch(err) {}
+    return ContentService.createTextOutput('ok').setMimeType(ContentService.MimeType.TEXT);
+  }
+
+PASO 3 — Publicar el script:
+  Implementar → Nueva implementación → Tipo: Aplicación web
+  Ejecutar como: Yo (tu cuenta)
+  Quién tiene acceso: Cualquier persona
+  → Copiar la URL del deployment → pegarla en APPS_SCRIPT_URL arriba ↑
+
+PASO 4 — Subir calificacion.html a Google Sites:
+  En Sites: Insertar → Insertar código (HTML) → pegar el contenido de este archivo
+  O: aloja el archivo en GitHub Pages / Netlify (gratis) y usa un iFrame en Sites.
+
+  Nota: Google Sites no permite subir HTML directamente como página.
+  La opción más sencilla es GitHub Pages (gratis, en 2 minutos).
+════════════════════════════════════════════════════════════
+-->
+</body>
+</html>
