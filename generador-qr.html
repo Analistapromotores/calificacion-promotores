@@ -22,16 +22,20 @@
     background:var(--ink);color:#fff;padding:1rem 2rem;
     display:flex;align-items:center;justify-content:space-between;
     position:sticky;top:0;z-index:100;
-    box-shadow:0 2px 12px rgba(0,0,0,.25)
+    box-shadow:0 2px 12px rgba(0,0,0,.25);gap:12px;flex-wrap:wrap;
   }
   .topbar h1{font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;color:#fff}
   .topbar span{font-size:.8rem;color:rgba(255,255,255,.5);display:block;margin-top:1px}
-  .btn-print-all{
-    padding:.55rem 1.1rem;background:var(--gold-mid);color:var(--gold-dark);
-    border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.85rem;
-    font-weight:500;cursor:pointer;transition:background .2s
+  .topbar-actions{display:flex;gap:8px;flex-wrap:wrap}
+  .btn-top{
+    padding:.5rem 1rem;border:none;border-radius:8px;
+    font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:500;cursor:pointer;
+    transition:background .2s;white-space:nowrap;
   }
-  .btn-print-all:hover{background:var(--gold-deep);color:#fff}
+  .btn-top.gold{background:var(--gold-mid);color:var(--gold-dark)}
+  .btn-top.gold:hover{background:var(--gold-deep);color:#fff}
+  .btn-top.outline{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.3)}
+  .btn-top.outline:hover{background:rgba(255,255,255,.1)}
 
   /* ── MAIN ── */
   .main{max-width:960px;margin:0 auto;padding:2rem 1.5rem}
@@ -211,7 +215,14 @@
     <h1>⚙️ Panel — Generador de QR</h1>
     <span>Solo acceso administrador</span>
   </div>
-  <button class="btn-print-all" onclick="imprimirTodo()">🖨️ Imprimir todos los QR</button>
+  <div class="topbar-actions">
+    <button class="btn-top outline" onclick="exportarJSON()">⬇️ Exportar lista</button>
+    <label class="btn-top outline" style="cursor:pointer">
+      📥 Importar lista
+      <input type="file" accept=".json" style="display:none" onchange="importarJSON(event)">
+    </label>
+    <button class="btn-top gold" onclick="imprimirTodo()">🖨️ Imprimir todos los QR</button>
+  </div>
 </div>
 
 <div class="main">
@@ -441,6 +452,57 @@
       }
     });
     setTimeout(()=>window.print(),400);
+  }
+
+
+  /* ── Exportar lista (backup JSON) ── */
+  function exportarJSON(){
+    if(!promotores.length){ alert('No hay promotores que exportar.'); return; }
+    const data={
+      exportado: new Date().toISOString(),
+      base_url: document.getElementById('base-url').value.trim(),
+      promotores: promotores
+    };
+    const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download='promotores_'+new Date().toISOString().slice(0,10)+'.json';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+
+  /* ── Importar lista desde JSON ── */
+  function importarJSON(event){
+    const file=event.target.files[0];
+    if(!file) return;
+    const reader=new FileReader();
+    reader.onload=e=>{
+      try{
+        const data=JSON.parse(e.target.result);
+        const lista=data.promotores||data;
+        if(!Array.isArray(lista)) throw new Error('Formato inválido');
+        const accion=promotores.length>0
+          ? confirm('¿Reemplazar los '+promotores.length+' promotores actuales?\n"Cancelar" para agregar a los existentes.')
+          : true;
+        if(accion){
+          promotores=lista;
+        } else {
+          let agregados=0;
+          lista.forEach(p=>{
+            if(!promotores.find(x=>x.id===p.id)){ promotores.push(p); agregados++; }
+          });
+          alert('✅ '+agregados+' promotores nuevos agregados (duplicados omitidos).');
+        }
+        if(data.base_url && !document.getElementById('base-url').value.trim()){
+          document.getElementById('base-url').value=data.base_url;
+          guardarConfig();
+          actualizarPreview();
+        }
+        guardar(); renderGrid(); actualizarStats();
+      }catch(err){ alert('❌ Error al leer el archivo: '+err.message); }
+    };
+    reader.readAsText(file);
+    event.target.value='';
   }
 
   /* ── Init ── */
