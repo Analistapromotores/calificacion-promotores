@@ -188,11 +188,18 @@
     }
     .promo-cargo{font-size:.55rem!important;color:#666!important}
     .promo-id{font-size:.5rem!important;padding:1px 3px!important}
-    .promo-qr{line-height:0}
-    .promo-qr canvas{display:none!important}
+    .promo-qr{line-height:0;position:relative}
+    .promo-qr canvas{
+      position:absolute!important;
+      left:-9999px!important;
+      visibility:hidden!important;
+      width:0!important;height:0!important;
+    }
+    .promo-qr img{display:none!important}
     .promo-qr img.print-ready{
       width:78px!important;height:78px!important;
-      display:block!important;margin:0 auto!important;
+      display:block!important;margin:2px auto!important;
+      visibility:visible!important;
     }
   }
 </style>
@@ -418,20 +425,22 @@
   /* ── Imprimir todos ── */
   function imprimirTodo(){
     const qrContainers=document.querySelectorAll('.promo-qr');
-    const allReady=Array.from(qrContainers).every(el=>el.querySelector('canvas')||el.querySelector('img'));
+    const allReady=Array.from(qrContainers).every(el=>el.querySelector('canvas')||el.querySelector('img.print-ready'));
     if(!allReady){ alert('⏳ Algunos QR aún están cargando. Espera 2 segundos e intenta de nuevo.'); return; }
     qrContainers.forEach(container=>{
+      // Eliminar imágenes previas para no duplicar
+      container.querySelectorAll('img.print-ready').forEach(el=>el.remove());
       const canvas=container.querySelector('canvas');
-      if(canvas && !container.querySelector('img.print-ready')){
+      if(canvas){
         const dataUrl=canvas.toDataURL('image/png');
         const img=document.createElement('img');
         img.src=dataUrl;
         img.className='print-ready';
-        img.style.cssText='width:100px;height:100px;display:block;margin:0 auto';
+        img.style.cssText='width:78px;height:78px;display:block;margin:2px auto';
         container.appendChild(img);
       }
     });
-    setTimeout(()=>window.print(),300);
+    setTimeout(()=>window.print(),400);
   }
 
   /* ── Init ── */
