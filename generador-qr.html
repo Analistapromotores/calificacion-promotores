@@ -167,15 +167,45 @@
 
   .empty-state{grid-column:1/-1;text-align:center;padding:3rem;color:var(--gray);font-size:.9rem}
 
-  /* Print — CORREGIDO para que los canvas/img se vean */
-  @media print{
+  /* ═══════════════════════════════════════
+     PRINT — QR tamaño fijo en mm (no px)
+     ═══════════════════════════════════════ */
+  @media print {
     .topbar,.config-card,.add-card,.stats,.search-wrap,.promo-actions,.tip-banner{display:none!important}
     body{background:#fff;padding:0}
     .main{padding:.5rem;max-width:none}
-    .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem}
-    .promo-card{border:1px solid #ccc;break-inside:avoid;padding:.75rem;page-break-inside:avoid}
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:.4rem
+    }
+    .promo-card{
+      border:1px solid #ccc;
+      break-inside:avoid;
+      padding:.5rem;
+      page-break-inside:avoid;
+      align-items:center
+    }
     .promo-id,.promo-cargo,.promo-url{display:block!important}
-    .promo-qr canvas,.promo-qr img{width:120px!important;height:120px!important}
+
+    /* FIX: tamaño en mm para evitar que el canvas se escale por DPI */
+    .promo-qr{
+      width:22mm !important;
+      height:22mm !important;
+      overflow:hidden !important;
+      display:flex !important;
+      align-items:center !important;
+      justify-content:center !important;
+    }
+    .promo-qr canvas,
+    .promo-qr img,
+    .promo-qr img.print-ready {
+      width:22mm !important;
+      height:22mm !important;
+      max-width:22mm !important;
+      max-height:22mm !important;
+      display:block !important;
+    }
   }
 </style>
 </head>
@@ -293,7 +323,6 @@
            Date.now().toString(36).substr(-3).toUpperCase();
   }
 
-  // BUG CORREGIDO: el formulario usa "nombre" y "cargo", no "name"
   function buildURL(p) {
     const base = document.getElementById('base-url').value.trim().replace(/\/$/, '');
     if (!base) return '(configura la URL del formulario arriba)';
@@ -311,7 +340,7 @@
     }
     document.getElementById('url-preview').innerHTML =
       'Ejemplo: <strong>' + escHtml(base) + '?id=ABC123&nombre=Juan%20Garc%C3%ADa&cargo=Promotor%20Norte</strong>';
-    renderGrid(); // regenerar QR con nueva URL
+    renderGrid();
   }
 
   /* ── Agregar uno ── */
@@ -418,7 +447,6 @@
 
       grid.appendChild(card);
 
-      // Generar QR — solo si la URL está configurada
       if (url && !url.startsWith('(')) {
         setTimeout(() => {
           try {
@@ -436,12 +464,11 @@
     });
   }
 
-  /* ── Descargar QR — CORREGIDO para canvas e img ── */
+  /* ── Descargar QR ── */
   function descargarQR(id, nombre) {
     const container = document.getElementById('qr-' + id);
     if (!container) return;
 
-    // QRCodeJS puede generar canvas o img dependiendo del navegador
     const canvas = container.querySelector('canvas');
     const img    = container.querySelector('img');
 
@@ -452,7 +479,6 @@
       a.href = canvas.toDataURL('image/png');
       a.click();
     } else if (img) {
-      // Convertir img a canvas para descargar
       const cv = document.createElement('canvas');
       cv.width = 130; cv.height = 130;
       const ctx = cv.getContext('2d');
@@ -464,16 +490,14 @@
     }
   }
 
-  /* ── Imprimir todos — CORREGIDO: espera a que los canvas estén listos ── */
+  /* ── Imprimir todos ── */
   function imprimirTodo() {
-    // Verificar que todos los QR estén generados
     const qrContainers = document.querySelectorAll('.promo-qr');
     const allReady = Array.from(qrContainers).every(el => el.querySelector('canvas') || el.querySelector('img'));
     if (!allReady) {
       alert('⏳ Algunos QR aún están generándose. Espera 2 segundos e intenta de nuevo.');
       return;
     }
-    // Convertir todos los canvas a img antes de imprimir (los canvas no siempre se imprimen)
     qrContainers.forEach(container => {
       const canvas = container.querySelector('canvas');
       if (canvas && !container.querySelector('img.print-ready')) {
@@ -481,7 +505,7 @@
         const img = document.createElement('img');
         img.src = dataUrl;
         img.className = 'print-ready';
-        img.style.cssText = 'width:120px;height:120px;display:block';
+        img.style.cssText = 'width:22mm;height:22mm;display:block';
         container.appendChild(img);
       }
     });
@@ -512,7 +536,7 @@
     reader.onload = e => {
       try {
         const data = JSON.parse(e.target.result);
-        const lista = data.promotores || data; // acepta array directo o el objeto exportado
+        const lista = data.promotores || data;
         if (!Array.isArray(lista)) throw new Error('Formato inválido');
 
         const accion = promotores.length > 0
@@ -522,7 +546,6 @@
         if (accion) {
           promotores = lista;
         } else {
-          // Agregar sin duplicar IDs
           let agregados = 0;
           lista.forEach(p => {
             if (!promotores.find(x => x.id === p.id)) {
@@ -547,7 +570,7 @@
       }
     };
     reader.readAsText(file);
-    event.target.value = ''; // reset para poder importar el mismo archivo de nuevo
+    event.target.value = '';
   }
 
   /* ── Helpers ── */
