@@ -157,36 +157,43 @@
 
   /* ── PRINT ── */
   @media print{
+    *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
     .topbar,.config-card,.add-card,.stats,.search-wrap,.promo-actions,
-    .btn-print-all,.tip-banner,.promo-url{display:none!important}
-    body{background:#fff;padding:0;margin:0}
-    .main{padding:4mm;max-width:none;margin:0}
+    .btn-print-all,.tip-banner,.promo-url,.btn-top,.topbar-actions{display:none!important}
+    body{background:#fff!important;padding:0;margin:0}
+    .main{padding:3mm 3mm 0 3mm;max-width:none;margin:0}
     .grid{
-      display:grid;
-      grid-template-columns:repeat(4,1fr);
-      gap:3mm;
+      display:grid!important;
+      grid-template-columns:repeat(4,1fr)!important;
+      gap:2mm!important;
     }
     .promo-card{
-      border:1px solid #ccc;
-      break-inside:avoid;
-      page-break-inside:avoid;
-      padding:5mm;
-      gap:3px;
-      border-radius:6px;
+      border:1px solid #bbb!important;
+      break-inside:avoid!important;
+      page-break-inside:avoid!important;
+      padding:3mm 2mm!important;
+      gap:2px!important;
+      border-radius:5px!important;
+      display:flex!important;
+      flex-direction:column!important;
+      align-items:center!important;
     }
-    .promo-avatar{width:36px;height:36px;font-size:.85rem}
-    .promo-name{font-size:.72rem;line-height:1.2}
-    .promo-cargo{font-size:.62rem}
-    .promo-id{font-size:.58rem;padding:1px 4px}
-    .promo-qr canvas,.promo-qr img{
-      width:100px!important;
-      height:100px!important;
-      display:block;
-      margin:0 auto;
+    .promo-avatar{
+      width:28px!important;height:28px!important;
+      font-size:.7rem!important;min-height:unset!important;
     }
-    /* Forzar 3 filas por página = 12 tarjetas */
-    .promo-card:nth-child(12n+1){ page-break-before:always }
-    .promo-card:first-child{ page-break-before:avoid }
+    .promo-name{
+      font-size:.6rem!important;line-height:1.15!important;
+      text-align:center!important;font-weight:600!important;
+    }
+    .promo-cargo{font-size:.55rem!important;color:#666!important}
+    .promo-id{font-size:.5rem!important;padding:1px 3px!important}
+    .promo-qr{line-height:0}
+    .promo-qr canvas{display:none!important}
+    .promo-qr img.print-ready{
+      width:78px!important;height:78px!important;
+      display:block!important;margin:0 auto!important;
+    }
   }
 </style>
 </head>
