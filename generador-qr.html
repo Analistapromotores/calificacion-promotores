@@ -234,8 +234,8 @@
       <div class="field">
         <label class="cfg" for="base-url">URL base del formulario (donde subiste formulario.html)</label>
         <input class="cfg" type="text" id="base-url"
-          placeholder="https://tu-dominio.com/formulario.html"
-          value="https://tu-dominio.com/formulario.html"
+          placeholder="https://analistapromotores.github.io/calificacion-promotores/calificacion.html"
+          value="https://analistapromotores.github.io/calificacion-promotores/calificacion.html"
           oninput="actualizarPreview()">
       </div>
     </div>
@@ -506,8 +506,15 @@
   }
 
   /* ── Init ── */
-  actualizarStats();
-  renderGrid();
+  const DEFAULT_URL='https://analistapromotores.github.io/calificacion-promotores/calificacion.html';
+  window.addEventListener('DOMContentLoaded',()=>{
+    const saved=localStorage.getItem('base_url_config')||'';
+    document.getElementById('base-url').value=saved||DEFAULT_URL;
+    if(!saved) localStorage.setItem('base_url_config',DEFAULT_URL);
+    actualizarPreview();
+    actualizarStats();
+    renderGrid();
+  });
 </script>
 </body>
 </html>
