@@ -17,30 +17,26 @@
   }
   body{font-family:'DM Sans',sans-serif;background:#F3F4F6;min-height:100vh;padding:0}
 
+  /* ── TOP BAR ── */
   .topbar{
     background:var(--ink);color:#fff;padding:1rem 2rem;
     display:flex;align-items:center;justify-content:space-between;
     position:sticky;top:0;z-index:100;
-    box-shadow:0 2px 12px rgba(0,0,0,.25);gap:12px;flex-wrap:wrap;
+    box-shadow:0 2px 12px rgba(0,0,0,.25)
   }
   .topbar h1{font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;color:#fff}
   .topbar span{font-size:.8rem;color:rgba(255,255,255,.5);display:block;margin-top:1px}
-  .topbar-actions{display:flex;gap:8px;flex-wrap:wrap}
-  .btn-top{
-    padding:.5rem 1rem;border:none;border-radius:8px;
-    font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:500;cursor:pointer;
-    transition:background .2s;white-space:nowrap;
+  .btn-print-all{
+    padding:.55rem 1.1rem;background:var(--gold-mid);color:var(--gold-dark);
+    border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.85rem;
+    font-weight:500;cursor:pointer;transition:background .2s
   }
-  .btn-top.gold{background:var(--gold-mid);color:var(--gold-dark)}
-  .btn-top.gold:hover{background:var(--gold-deep);color:#fff}
-  .btn-top.outline{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.3)}
-  .btn-top.outline:hover{background:rgba(255,255,255,.1)}
-  .btn-top.red{background:var(--red-soft);color:var(--red);border:1px solid rgba(192,57,43,.2)}
-  .btn-top.red:hover{background:#FCA5A5}
+  .btn-print-all:hover{background:var(--gold-deep);color:#fff}
 
-  .main{max-width:980px;margin:0 auto;padding:2rem 1.5rem}
+  /* ── MAIN ── */
+  .main{max-width:960px;margin:0 auto;padding:2rem 1.5rem}
 
-  /* Config URL */
+  /* ── URL CONFIG ── */
   .config-card{
     background:#fff;border:1px solid var(--gray-border);border-radius:14px;
     padding:1.5rem;margin-bottom:1.5rem;
@@ -61,16 +57,9 @@
     border:1px solid var(--gray-border);border-radius:8px;
     font-size:.8rem;color:var(--gray);word-break:break-all;line-height:1.5
   }
-  .url-preview strong{color:var(--ink-soft)}
+  .url-preview strong{color:var(--ink)}
 
-  /* Tip banner */
-  .tip-banner{
-    background:var(--blue-soft);border:1px solid rgba(29,111,164,.2);border-radius:10px;
-    padding:.75rem 1rem;margin-bottom:1.5rem;font-size:.82rem;color:#1e4d6b;line-height:1.6;
-  }
-  .tip-banner strong{color:var(--blue)}
-
-  /* Add promoter */
+  /* ── ADD PROMOTER ── */
   .add-card{
     background:#fff;border:1px solid var(--gray-border);border-radius:14px;
     padding:1.5rem;margin-bottom:1.5rem;
@@ -92,7 +81,11 @@
   }
   .btn-add:hover{background:#2D1F0A}
 
-  .bulk-toggle{font-size:.8rem;color:var(--blue);cursor:pointer;margin-top:.75rem;display:inline-block;text-decoration:underline}
+  /* Bulk import */
+  .bulk-toggle{
+    font-size:.8rem;color:var(--blue);cursor:pointer;margin-top:.75rem;display:inline-block;
+    text-decoration:underline
+  }
   .bulk-area{display:none;margin-top:.75rem}
   .bulk-area.show{display:block}
   .bulk-area textarea{
@@ -108,7 +101,7 @@
     font-family:'DM Sans',sans-serif;font-size:.82rem;cursor:pointer
   }
 
-  /* Stats bar */
+  /* ── STATS BAR ── */
   .stats{display:flex;gap:12px;margin-bottom:1.25rem;flex-wrap:wrap}
   .stat{
     background:#fff;border:1px solid var(--gray-border);border-radius:10px;
@@ -118,7 +111,7 @@
   .stat-n{font-size:1.5rem;font-weight:700;color:var(--ink);font-family:'Playfair Display',serif}
   .stat-l{font-size:.73rem;color:var(--gray);text-transform:uppercase;letter-spacing:.05em}
 
-  /* Search */
+  /* ── SEARCH ── */
   .search-wrap{margin-bottom:1rem;position:relative}
   .search-wrap input{
     width:100%;padding:.65rem 1rem .65rem 2.5rem;
@@ -129,7 +122,7 @@
   .search-wrap input:focus{border-color:var(--gold-mid)}
   .search-wrap::before{content:'🔍';position:absolute;left:.75rem;top:50%;transform:translateY(-50%);font-size:.9rem}
 
-  /* Grid */
+  /* ── GRID ── */
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1rem}
 
   .promo-card{
@@ -147,11 +140,6 @@
   .promo-cargo{font-size:.75rem;color:var(--gray);text-align:center}
   .promo-id{font-size:.68rem;color:var(--gray);font-family:monospace;background:var(--gray-light);padding:2px 6px;border-radius:4px}
   .promo-qr{/* QR container */}
-  .promo-qr img,.promo-qr canvas{display:block}
-  .promo-url{
-    font-size:.65rem;color:var(--gray);word-break:break-all;text-align:center;
-    background:var(--gray-light);border-radius:6px;padding:4px 6px;width:100%;line-height:1.4;
-  }
   .promo-actions{display:flex;gap:6px;width:100%}
   .btn-dl{
     flex:1;padding:.4rem;background:var(--gold-light);border:1px solid var(--border);
@@ -167,45 +155,38 @@
 
   .empty-state{grid-column:1/-1;text-align:center;padding:3rem;color:var(--gray);font-size:.9rem}
 
-  /* ═══════════════════════════════════════
-     PRINT — QR tamaño fijo en mm (no px)
-     ═══════════════════════════════════════ */
-  @media print {
-    .topbar,.config-card,.add-card,.stats,.search-wrap,.promo-actions,.tip-banner{display:none!important}
-    body{background:#fff;padding:0}
-    .main{padding:.5rem;max-width:none}
+  /* ── PRINT ── */
+  @media print{
+    .topbar,.config-card,.add-card,.stats,.search-wrap,.promo-actions,
+    .btn-print-all,.tip-banner,.promo-url{display:none!important}
+    body{background:#fff;padding:0;margin:0}
+    .main{padding:4mm;max-width:none;margin:0}
     .grid{
       display:grid;
       grid-template-columns:repeat(4,1fr);
-      gap:.4rem
+      gap:3mm;
     }
     .promo-card{
       border:1px solid #ccc;
       break-inside:avoid;
-      padding:.5rem;
       page-break-inside:avoid;
-      align-items:center
+      padding:5mm;
+      gap:3px;
+      border-radius:6px;
     }
-    .promo-id,.promo-cargo,.promo-url{display:block!important}
-
-    /* FIX: tamaño en mm para evitar que el canvas se escale por DPI */
-    .promo-qr{
-      width:22mm !important;
-      height:22mm !important;
-      overflow:hidden !important;
-      display:flex !important;
-      align-items:center !important;
-      justify-content:center !important;
+    .promo-avatar{width:36px;height:36px;font-size:.85rem}
+    .promo-name{font-size:.72rem;line-height:1.2}
+    .promo-cargo{font-size:.62rem}
+    .promo-id{font-size:.58rem;padding:1px 4px}
+    .promo-qr canvas,.promo-qr img{
+      width:100px!important;
+      height:100px!important;
+      display:block;
+      margin:0 auto;
     }
-    .promo-qr canvas,
-    .promo-qr img,
-    .promo-qr img.print-ready {
-      width:22mm !important;
-      height:22mm !important;
-      max-width:22mm !important;
-      max-height:22mm !important;
-      display:block !important;
-    }
+    /* Forzar 3 filas por página = 12 tarjetas */
+    .promo-card:nth-child(12n+1){ page-break-before:always }
+    .promo-card:first-child{ page-break-before:avoid }
   }
 </style>
 </head>
@@ -216,38 +197,25 @@
     <h1>⚙️ Panel — Generador de QR</h1>
     <span>Solo acceso administrador</span>
   </div>
-  <div class="topbar-actions">
-    <button class="btn-top outline" onclick="exportarJSON()">⬇️ Exportar lista</button>
-    <label class="btn-top outline" style="cursor:pointer">
-      📥 Importar lista
-      <input type="file" accept=".json" style="display:none" onchange="importarJSON(event)">
-    </label>
-    <button class="btn-top gold" onclick="imprimirTodo()">🖨️ Imprimir todos</button>
-  </div>
+  <button class="btn-print-all" onclick="imprimirTodo()">🖨️ Imprimir todos los QR</button>
 </div>
 
 <div class="main">
-
-  <div class="tip-banner">
-    💡 <strong>¿Cómo funciona?</strong>
-    Ingresa la URL de tu formulario abajo → agrega tus promotores → cada tarjeta genera un QR único.
-    El cliente escanea el QR → el nombre del promotor aparece bloqueado automáticamente.
-    <br><strong>Importante:</strong> Exporta tu lista regularmente con el botón "Exportar lista" — así no pierdes los datos si cambias de navegador.
-  </div>
 
   <!-- Config URL -->
   <div class="config-card">
     <h2>🔗 URL del formulario de calificación</h2>
     <div class="config-row">
       <div class="field">
-        <label class="cfg" for="base-url">URL donde subiste calificacion.html</label>
-        <input class="cfg" type="url" id="base-url"
-          placeholder="https://tu-usuario.github.io/calificacion.html"
-          oninput="guardarConfig();actualizarPreview()">
+        <label class="cfg" for="base-url">URL base del formulario (donde subiste formulario.html)</label>
+        <input class="cfg" type="text" id="base-url"
+          placeholder="https://tu-dominio.com/formulario.html"
+          value="https://tu-dominio.com/formulario.html"
+          oninput="actualizarPreview()">
       </div>
     </div>
     <div class="url-preview" id="url-preview">
-      Ingresa la URL arriba para ver el ejemplo generado
+      Ejemplo: <strong>https://tu-dominio.com/formulario.html?id=ABC123&nombre=Juan%20García&cargo=Promotor</strong>
     </div>
   </div>
 
@@ -286,7 +254,7 @@
 
   <!-- Buscar -->
   <div class="search-wrap">
-    <input type="text" id="search-input" placeholder="Buscar por nombre, cargo o ID…" oninput="renderGrid()">
+    <input type="text" id="search-input" placeholder="Buscar promotor por nombre, cargo o ID…" oninput="renderGrid()">
   </div>
 
   <!-- Grid -->
@@ -294,288 +262,174 @@
 </div>
 
 <script>
-  // ═══════════════════════════════════
-  // Estado — cargado desde localStorage
-  // ═══════════════════════════════════
   let promotores = JSON.parse(localStorage.getItem('promotores_db') || '[]');
 
-  // Cargar URL guardada
-  window.addEventListener('DOMContentLoaded', () => {
-    const savedUrl = localStorage.getItem('base_url_config') || '';
-    if (savedUrl) {
-      document.getElementById('base-url').value = savedUrl;
-      actualizarPreview();
-    }
-    actualizarStats();
-    renderGrid();
-  });
+  function guardar(){ localStorage.setItem('promotores_db', JSON.stringify(promotores)); }
 
-  function guardar() {
-    localStorage.setItem('promotores_db', JSON.stringify(promotores));
+  function genId(){
+    return Math.random().toString(36).substr(2,4).toUpperCase() + Date.now().toString(36).substr(-3).toUpperCase();
   }
 
-  function guardarConfig() {
-    localStorage.setItem('base_url_config', document.getElementById('base-url').value.trim());
-  }
-
-  function genId() {
-    return Math.random().toString(36).substr(2,4).toUpperCase() +
-           Date.now().toString(36).substr(-3).toUpperCase();
-  }
-
-  function buildURL(p) {
+  function buildURL(p){
     const base = document.getElementById('base-url').value.trim().replace(/\/$/, '');
-    if (!base) return '(configura la URL del formulario arriba)';
-    return base +
-      '?id='     + encodeURIComponent(p.id) +
-      '&nombre=' + encodeURIComponent(p.nombre) +
-      '&cargo='  + encodeURIComponent(p.cargo || 'Promotor');
+    return base + '?id=' + encodeURIComponent(p.id) +
+           '&nombre=' + encodeURIComponent(p.nombre) +
+           '&cargo='  + encodeURIComponent(p.cargo||'Promotor');
   }
 
-  function actualizarPreview() {
+  function actualizarPreview(){
     const base = document.getElementById('base-url').value.trim();
-    if (!base) {
-      document.getElementById('url-preview').innerHTML = 'Ingresa la URL arriba para ver el ejemplo generado';
-      return;
-    }
     document.getElementById('url-preview').innerHTML =
-      'Ejemplo: <strong>' + escHtml(base) + '?id=ABC123&nombre=Juan%20Garc%C3%ADa&cargo=Promotor%20Norte</strong>';
+      'Ejemplo generado: <strong>' + base + '?id=ABC123&nombre=Juan%20García&cargo=Promotor</strong>';
     renderGrid();
   }
 
   /* ── Agregar uno ── */
-  function agregarPromotor() {
+  function agregarPromotor(){
     const nombre = document.getElementById('inp-nombre').value.trim();
-    if (!nombre) { alert('El nombre es obligatorio'); return; }
-    const cargo = document.getElementById('inp-cargo').value.trim() || 'Promotor';
-    const id    = document.getElementById('inp-id').value.trim().toUpperCase() || genId();
+    if(!nombre){ alert('El nombre es obligatorio'); return; }
+    const cargo  = document.getElementById('inp-cargo').value.trim() || 'Promotor';
+    const id     = document.getElementById('inp-id').value.trim() || genId();
 
-    if (promotores.find(p => p.id === id)) { alert('Ya existe un promotor con ese ID: ' + id); return; }
+    if(promotores.find(p=>p.id===id)){ alert('Ya existe un promotor con ese ID'); return; }
 
     promotores.push({ id, nombre, cargo });
     guardar();
-    document.getElementById('inp-nombre').value = '';
-    document.getElementById('inp-cargo').value  = '';
-    document.getElementById('inp-id').value     = '';
-    document.getElementById('inp-nombre').focus();
+    document.getElementById('inp-nombre').value='';
+    document.getElementById('inp-cargo').value='';
+    document.getElementById('inp-id').value='';
     renderGrid();
     actualizarStats();
   }
 
   /* ── Importar masivo ── */
-  function toggleBulk() {
-    document.getElementById('bulk-area').classList.toggle('show');
+  function toggleBulk(){
+    const el=document.getElementById('bulk-area');
+    el.classList.toggle('show');
   }
 
-  function importarMasivo() {
-    const lines = document.getElementById('bulk-text').value.trim().split('\n');
-    let added = 0;
-    lines.forEach(line => {
-      line = line.trim();
-      if (!line) return;
-      const parts  = line.split(',');
-      const nombre = parts[0]?.trim();
-      const cargo  = parts[1]?.trim() || 'Promotor';
-      if (!nombre) return;
-      const id = genId();
-      promotores.push({ id, nombre, cargo });
+  function importarMasivo(){
+    const lines=document.getElementById('bulk-text').value.trim().split('\n');
+    let added=0;
+    lines.forEach(line=>{
+      const parts=line.split(',');
+      const nombre=parts[0]?.trim();
+      const cargo=parts[1]?.trim()||'Promotor';
+      if(!nombre) return;
+      const id=genId();
+      promotores.push({id,nombre,cargo});
       added++;
     });
     guardar();
-    document.getElementById('bulk-text').value = '';
+    document.getElementById('bulk-text').value='';
     document.getElementById('bulk-area').classList.remove('show');
     renderGrid();
     actualizarStats();
-    alert('✅ ' + added + ' promotores importados correctamente.');
+    alert('✅ '+added+' promotores importados correctamente.');
   }
 
   /* ── Eliminar ── */
-  function eliminar(id) {
-    const p = promotores.find(x => x.id === id);
-    if (!confirm('¿Eliminar a ' + (p?.nombre||id) + '?\nSu QR dejará de funcionar.')) return;
-    promotores = promotores.filter(p => p.id !== id);
+  function eliminar(id){
+    if(!confirm('¿Eliminar este promotor? Su QR dejará de funcionar.')) return;
+    promotores=promotores.filter(p=>p.id!==id);
     guardar();
     renderGrid();
     actualizarStats();
   }
 
   /* ── Stats ── */
-  function actualizarStats() {
-    document.getElementById('stat-total').textContent = promotores.length;
-    const cargos = new Set(promotores.map(p => p.cargo || 'Promotor'));
-    document.getElementById('stat-cargos').textContent = cargos.size;
+  function actualizarStats(){
+    document.getElementById('stat-total').textContent=promotores.length;
+    const cargos=new Set(promotores.map(p=>p.cargo));
+    document.getElementById('stat-cargos').textContent=cargos.size;
   }
 
   /* ── Render Grid ── */
-  function renderGrid() {
-    const q = document.getElementById('search-input').value.toLowerCase();
-    const filtered = promotores.filter(p =>
-      p.nombre.toLowerCase().includes(q) ||
-      (p.cargo||'').toLowerCase().includes(q) ||
+  function renderGrid(){
+    const q=document.getElementById('search-input').value.toLowerCase();
+    const filtered=promotores.filter(p=>
+      p.nombre.toLowerCase().includes(q)||
+      (p.cargo||'').toLowerCase().includes(q)||
       p.id.toLowerCase().includes(q)
     );
-    const grid = document.getElementById('grid');
-    grid.innerHTML = '';
+    const grid=document.getElementById('grid');
+    grid.innerHTML='';
 
-    if (!filtered.length) {
-      grid.innerHTML = '<div class="empty-state">' +
-        (promotores.length === 0
+    if(!filtered.length){
+      grid.innerHTML='<div class="empty-state">'+
+        (promotores.length===0
           ? '👆 Agrega promotores arriba para generar sus QR'
-          : '🔍 No se encontraron promotores con ese filtro') +
+          : '🔍 No se encontraron promotores con ese filtro')+
         '</div>';
       return;
     }
 
-    filtered.forEach(p => {
-      const card = document.createElement('div');
-      card.className = 'promo-card';
+    filtered.forEach(p=>{
+      const card=document.createElement('div');
+      card.className='promo-card';
 
-      const initials = p.nombre.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
-      const url = buildURL(p);
+      const initials=p.nombre.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+      const url=buildURL(p);
 
-      card.innerHTML = `
-        <div class="promo-avatar">${escHtml(initials)}</div>
-        <div class="promo-name">${escHtml(p.nombre)}</div>
-        <div class="promo-cargo">${escHtml(p.cargo||'Promotor')}</div>
-        <div class="promo-id">${escHtml(p.id)}</div>
-        <div class="promo-qr" id="qr-${escHtml(p.id)}"></div>
-        <div class="promo-url">${escHtml(url.substring(0,80))}…</div>
+      card.innerHTML=`
+        <div class="promo-avatar">${initials}</div>
+        <div class="promo-name">${p.nombre}</div>
+        <div class="promo-cargo">${p.cargo||'Promotor'}</div>
+        <div class="promo-id">${p.id}</div>
+        <div class="promo-qr" id="qr-${p.id}"></div>
         <div class="promo-actions">
-          <button class="btn-dl" onclick="descargarQR('${escAttr(p.id)}','${escAttr(p.nombre.replace(/'/g,''))}')">⬇️ Descargar</button>
-          <button class="btn-rm" onclick="eliminar('${escAttr(p.id)}')">🗑</button>
+          <button class="btn-dl" onclick="descargarQR('${p.id}','${p.nombre.replace(/'/g,'')}')">⬇️ Descargar</button>
+          <button class="btn-rm" onclick="eliminar('${p.id}')">🗑</button>
         </div>`;
 
       grid.appendChild(card);
 
-      if (url && !url.startsWith('(')) {
-        setTimeout(() => {
-          try {
-            new QRCode(document.getElementById('qr-' + p.id), {
-              text: url, width: 130, height: 130,
-              colorDark: '#1A1209', colorLight: '#FFFFFF',
-              correctLevel: QRCode.CorrectLevel.M
-            });
-          } catch(e) { console.error('QR error:', e); }
-        }, 50);
-      } else {
-        document.getElementById('qr-' + p.id).innerHTML =
-          '<div style="width:130px;height:130px;display:flex;align-items:center;justify-content:center;background:#FFF8E7;border-radius:8px;font-size:.7rem;color:#C8900A;text-align:center;padding:8px">Configura la URL del formulario</div>';
-      }
+      // Generar QR
+      setTimeout(()=>{
+        try{
+          new QRCode(document.getElementById('qr-'+p.id),{
+            text:url,width:130,height:130,
+            colorDark:'#1A1209',colorLight:'#FFFFFF',
+            correctLevel:QRCode.CorrectLevel.M
+          });
+        }catch(e){}
+      },50);
     });
   }
 
-  /* ── Descargar QR ── */
-  function descargarQR(id, nombre) {
-    const container = document.getElementById('qr-' + id);
-    if (!container) return;
-
-    const canvas = container.querySelector('canvas');
-    const img    = container.querySelector('img');
-
-    const a = document.createElement('a');
-    a.download = 'QR_' + (nombre||id).replace(/\s+/g,'_') + '_' + id + '.png';
-
-    if (canvas) {
-      a.href = canvas.toDataURL('image/png');
-      a.click();
-    } else if (img) {
-      const cv = document.createElement('canvas');
-      cv.width = 130; cv.height = 130;
-      const ctx = cv.getContext('2d');
-      ctx.drawImage(img, 0, 0);
-      a.href = cv.toDataURL('image/png');
-      a.click();
-    } else {
-      alert('El QR aún está cargando. Espera un momento e intenta de nuevo.');
-    }
+  /* ── Descargar QR individual ── */
+  function descargarQR(id, nombre){
+    const container=document.getElementById('qr-'+id);
+    const canvas=container.querySelector('canvas');
+    if(!canvas){ alert('El QR aún está cargando, intenta en un momento'); return; }
+    const a=document.createElement('a');
+    a.href=canvas.toDataURL('image/png');
+    a.download='QR_'+nombre.replace(/\s+/g,'_')+'_'+id+'.png';
+    a.click();
   }
 
   /* ── Imprimir todos ── */
-  function imprimirTodo() {
-    const qrContainers = document.querySelectorAll('.promo-qr');
-    const allReady = Array.from(qrContainers).every(el => el.querySelector('canvas') || el.querySelector('img'));
-    if (!allReady) {
-      alert('⏳ Algunos QR aún están generándose. Espera 2 segundos e intenta de nuevo.');
-      return;
-    }
-    qrContainers.forEach(container => {
-      const canvas = container.querySelector('canvas');
-      if (canvas && !container.querySelector('img.print-ready')) {
-        const dataUrl = canvas.toDataURL('image/png');
-        const img = document.createElement('img');
-        img.src = dataUrl;
-        img.className = 'print-ready';
-        img.style.cssText = 'width:22mm;height:22mm;display:block';
+  function imprimirTodo(){
+    const qrContainers=document.querySelectorAll('.promo-qr');
+    const allReady=Array.from(qrContainers).every(el=>el.querySelector('canvas')||el.querySelector('img'));
+    if(!allReady){ alert('⏳ Algunos QR aún están cargando. Espera 2 segundos e intenta de nuevo.'); return; }
+    qrContainers.forEach(container=>{
+      const canvas=container.querySelector('canvas');
+      if(canvas && !container.querySelector('img.print-ready')){
+        const dataUrl=canvas.toDataURL('image/png');
+        const img=document.createElement('img');
+        img.src=dataUrl;
+        img.className='print-ready';
+        img.style.cssText='width:100px;height:100px;display:block;margin:0 auto';
         container.appendChild(img);
       }
     });
-    setTimeout(() => window.print(), 300);
+    setTimeout(()=>window.print(),300);
   }
 
-  /* ── Exportar lista (backup JSON) ── */
-  function exportarJSON() {
-    if (!promotores.length) { alert('No hay promotores que exportar.'); return; }
-    const data = {
-      exportado: new Date().toISOString(),
-      base_url: document.getElementById('base-url').value.trim(),
-      promotores: promotores
-    };
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'promotores_' + new Date().toISOString().slice(0,10) + '.json';
-    a.click();
-    URL.revokeObjectURL(a.href);
-  }
-
-  /* ── Importar lista desde JSON ── */
-  function importarJSON(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = e => {
-      try {
-        const data = JSON.parse(e.target.result);
-        const lista = data.promotores || data;
-        if (!Array.isArray(lista)) throw new Error('Formato inválido');
-
-        const accion = promotores.length > 0
-          ? confirm('¿Reemplazar los ' + promotores.length + ' promotores actuales?\n"Cancelar" para agregar a los existentes.')
-          : true;
-
-        if (accion) {
-          promotores = lista;
-        } else {
-          let agregados = 0;
-          lista.forEach(p => {
-            if (!promotores.find(x => x.id === p.id)) {
-              promotores.push(p);
-              agregados++;
-            }
-          });
-          alert('✅ ' + agregados + ' promotores nuevos agregados (los duplicados se omitieron).');
-        }
-
-        if (data.base_url && !document.getElementById('base-url').value.trim()) {
-          document.getElementById('base-url').value = data.base_url;
-          guardarConfig();
-          actualizarPreview();
-        }
-
-        guardar();
-        renderGrid();
-        actualizarStats();
-      } catch(err) {
-        alert('❌ Error al leer el archivo: ' + err.message);
-      }
-    };
-    reader.readAsText(file);
-    event.target.value = '';
-  }
-
-  /* ── Helpers ── */
-  function escHtml(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-  function escAttr(s) { return String(s||'').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+  /* ── Init ── */
+  actualizarStats();
+  renderGrid();
 </script>
 </body>
 </html>
