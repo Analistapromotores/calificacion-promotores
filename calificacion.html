@@ -517,13 +517,16 @@ function phoneValida(val) { return soloDigitos(val).length === 10; };
         && (!needsPhone || phoneValida(phone))
         && (!phoneEscrita || phoneValida(phone));   
     btn.disabled = !ok;
-    if (selectedRating === 0) {
-      btn.textContent = 'Selecciona una calificación';
-   } else if (needsPhone && !phoneValida(phone)) {
-      btn.textContent = 'Ingresa tu teléfono para enviar el comentario';
-    } else {
-      btn.textContent = 'Enviar calificación ✓';
-    }
+   // ✅ DESPUÉS
+if (selectedRating === 0) {
+  btn.textContent = 'Selecciona una calificación';
+} else if (phoneEscrita && !phoneValida(phone)) {
+  btn.textContent = '⚠️ Verifica que el número tenga 10 dígitos';
+} else if (needsPhone && !phoneValida(phone)) {
+  btn.textContent = 'Ingresa tu teléfono para enviar el comentario';
+} else {
+  btn.textContent = 'Enviar calificación ✓';
+}
   }
 
   /* ── 8. Submit ── */
