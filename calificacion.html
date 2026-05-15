@@ -343,7 +343,11 @@
   let promotorCargo = null;
   let geoData = { lat: null, lon: null, accuracy: null, address: 'No disponible' };
   const formOpenTime = Date.now();
+ 
+function soloDigitos(val) { return val.replace(/\D/g, ''); }
+function phoneValida(val) { return soloDigitos(val).length === 10; };
 
+ 
   /* ── 1. Leer parámetros de URL ── */
   function readURLParams() {
     const params = new URLSearchParams(window.location.search);
@@ -507,11 +511,13 @@
     const comment = document.getElementById('comentario').value.trim();
     const btn     = document.getElementById('btn-enviar');
     const needsPhone = comment.length > 0;
-    const ok = selectedRating > 0 && (!needsPhone || phone.length >= 7);
+    // DESPUÉS
+    const ok = selectedRating > 0 && (!needsPhone || phoneValida(phone));
     btn.disabled = !ok;
     if (selectedRating === 0) {
       btn.textContent = 'Selecciona una calificación';
-    } else if (needsPhone && phone.length < 7) {
+   // DESPUÉS
+   } else if (needsPhone && !phoneValida(phone)) {
       btn.textContent = 'Ingresa tu teléfono para enviar el comentario';
     } else {
       btn.textContent = 'Enviar calificación ✓';
@@ -527,7 +533,7 @@
     const phone   = document.getElementById('telefono').value.trim();
     const comment = document.getElementById('comentario').value.trim();
 
-    if (comment.length > 0 && phone.length < 7) {
+     if (comment.length > 0 && !phoneValida(phone)) {
       document.getElementById('telefono').classList.add('error-field');
       document.getElementById('phone-error').classList.add('show');
       return;
