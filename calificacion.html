@@ -511,12 +511,10 @@ function phoneValida(val) { return soloDigitos(val).length === 10; };
     const comment = document.getElementById('comentario').value.trim();
     const btn     = document.getElementById('btn-enviar');
     const needsPhone = comment.length > 0;
-    // DESPUÉS
     const ok = selectedRating > 0 && (!needsPhone || phoneValida(phone));
     btn.disabled = !ok;
     if (selectedRating === 0) {
       btn.textContent = 'Selecciona una calificación';
-   // DESPUÉS
    } else if (needsPhone && !phoneValida(phone)) {
       btn.textContent = 'Ingresa tu teléfono para enviar el comentario';
     } else {
