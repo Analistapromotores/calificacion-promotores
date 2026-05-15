@@ -510,8 +510,12 @@ function phoneValida(val) { return soloDigitos(val).length === 10; };
     const phone   = document.getElementById('telefono').value.trim();
     const comment = document.getElementById('comentario').value.trim();
     const btn     = document.getElementById('btn-enviar');
-    const needsPhone = comment.length > 0;
-    const ok = selectedRating > 0 && (!needsPhone || phoneValida(phone));
+    // ✅ DESPUÉS — si escriben algo en teléfono, debe ser 10 dígitos siempre
+   const needsPhone = comment.length > 0;
+   const phoneEscrita = phone.length > 0;
+   const ok = selectedRating > 0 
+        && (!needsPhone || phoneValida(phone))
+        && (!phoneEscrita || phoneValida(phone));   
     btn.disabled = !ok;
     if (selectedRating === 0) {
       btn.textContent = 'Selecciona una calificación';
@@ -530,8 +534,7 @@ function phoneValida(val) { return soloDigitos(val).length === 10; };
   async function enviar() {
     const phone   = document.getElementById('telefono').value.trim();
     const comment = document.getElementById('comentario').value.trim();
-
-     if (comment.length > 0 && !phoneValida(phone)) {
+  if ((comment.length > 0 || phone.length > 0) && !phoneValida(phone)) {
       document.getElementById('telefono').classList.add('error-field');
       document.getElementById('phone-error').classList.add('show');
       return;
